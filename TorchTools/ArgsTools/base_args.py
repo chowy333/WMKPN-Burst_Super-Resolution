@@ -11,6 +11,8 @@ class BaseArgs():
                             default='datasets/train_df2k.txt',  help='path to train list')
         parser.add_argument('--valid_list', type=str,
                             default='datasets/valid_df2k.txt', help='path to valid list')
+        parser.add_argument('--evaluate', action='store_true', help='Just evaluate store_true')
+
 
         parser.add_argument('--denoise', action='store_true',  help='denoise store_true')
         parser.add_argument('--max_noise', default=0.0748, type=float, help='noise_level')
