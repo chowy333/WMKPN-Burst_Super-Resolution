@@ -26,9 +26,6 @@ from TorchTools.LossTools.metrics import PSNR, AverageMeter
 #    if name.islower() and not name.startswith("__")
 #    and callable(models.__dict__[name]))
 
-best_acc1 = 0
-
-
 def main():
 
     ################## parser ########################
@@ -76,11 +73,6 @@ def main():
     #                            momentum=args.momentum,
     #                            weight_decay=args.weight_decay)
 
-    # load checkpoints
-
-    #best_psnr = 0
-    #cur_psnr = 0
-
     ################## Loading checkpoints ########################
     if args.pretrained_model:
         if os.path.isfile(args.pretrained_model):
@@ -96,7 +88,7 @@ def main():
     # When input size is constant, True is good. But opposite case is bad.
     cudnn.benchmark = True
 
-    # Data loading code incompleted!!!
+    ############### Data loading code incompleted!!! ###################
     traindir = os.path.join(args.data, 'train') #How to load data
     valdir = os.path.join(args.data, 'val') #How to load data
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
@@ -129,103 +121,94 @@ def main():
         validate(val_loader, model, criterion, args)
         return
 
-
-    print('---------- Start training -------------')
-    for epoch in range(args.start_epoch, args.epochs):
-        adjust_learning_rate(optimizer, epoch, args)
-
-        # train for one epoch
-        train(train_loader, model, criterion, optimizer, epoch, args)
-
-        # evaluate on validation set
-        acc1 = validate(val_loader, model, criterion, args)
-
-        # remember best acc@1 and save checkpoint
-        is_best = acc1 > best_acc1
-        best_acc1 = max(acc1, best_acc1)
-
-def train(train_loader, model, criterion, optimizer, epoch, args):
+    current_iter = 0
+    cur_psnr = 0
+    cur_ssim = 0
+    best_psnr = 0
     batch_time = AverageMeter('Time', ':6.3f')
     data_time = AverageMeter('Data', ':6.3f')
     logger = Tf_Logger(args.logdir)
     losses = AverageMeter('Loss', ':.4e')
+    print('---------- Start training -------------')
+    for epoch in range(args.start_epoch, args.epochs):
+        adjust_learning_rate(optimizer, epoch, args)
 
-    progress = ProgressMeter(
-        len(train_loader),
-        [batch_time, data_time, losses],
-        prefix="Epoch: [{}]".format(epoch))
+        progress = ProgressMeter(
+            len(train_loader),
+            [batch_time, data_time, losses],
+            prefix="Epoch: [{}]".format(epoch))
 
-    # switch to train mode
-    model.train()
+        model.train()
 
-    end = time.time()
-    for i, (images, target) in enumerate(train_loader):
-        # measure data loading time
-        data_time.update(time.time() - end)
-
-        if args.gpu_id is not None:
-            images = images.cuda(args.gpu_id, non_blocking=True)
-        if torch.cuda.is_available():
-            target = target.cuda(args.gpu_id, non_blocking=True)
-
-        # compute output
-        output = model(images)
-        loss = criterion(output, target)
-
-        # measure accuracy and record loss
-
-        losses.update(loss.item(), images.size(0))
-
-        # compute gradient and do step
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        scheduler.step()
-
-        # measure elapsed time
-        batch_time.update(time.time() - end)
         end = time.time()
+        for i, (images, target) in enumerate(train_loader):
+            current_iter += 1
 
-        if i % args.print_freq == 0:
-            print('Epoch: [{0}][{1}/{2}]\t'
-                      'Iter:{3}\t'
-                      'Loss {loss.val: .4f} ({loss.avg: .4f})\t'.format(
-                       epoch, i, len(train_loader), current_iter, loss=losses))
+            # evaluate on validation set
+            if current_iter % args.valid_freq == 0:
+                cur_psnr, cur_ssim = validate(val_loader, model, criterion, args)
+            # measure data loading time
+            data_time.update(time.time() - end)
 
-        # log
-        info = {
-            'loss': loss.item(),
-            'psnr': cur_psnr,
-            'ssim': cur_ssim
-        }
-        for tag, value in info.items():
-            logger.scalar_summary(tag, value, current_iter)
+            images = images.to(device)
+            target = target.to(device)
 
-        if current_iter % args.save_freq == 0:
-                is_best = (cur_psnr > best_psnr)
-                best_psnr = max(cur_psnr, best_psnr)
-                #model_cpu = {k: v.cpu() for k, v in model.state_dict().items()}
-                save_checkpoint({
-                    'epoch': epoch + 1,
-                    'iter': current_iter,
-                    'arch': args.model,
-                    'state_dict': model.state_dict(),
-                    'best_psnr': best_psnr,
-                    'optimizer' : optimizer.state_dict(),
-                }, is_best, args = args)
+            # compute output
+            output = model(images)
+            loss = criterion(output, target).cuda()
 
-                #save_checkpoint({
-                #    'iter': current_iter,
-                #    'state_dict': model_cpu,
-                #    'best_psnr': best_psnr
-                #}, is_best, args=args)
-    print('Saving the final model.')
+            # measure accuracy and record loss
+
+            losses.update(loss.item(), images.size(0))
+
+            # compute gradient and do step
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            scheduler.step()
+
+            # measure elapsed time
+            batch_time.update(time.time() - end)
+            end = time.time()
+
+            if current_iter % args.print_freq == 0:
+                print('Epoch: [{0}][{1}/{2}]\t'
+                          'Iter:{3}\t'
+                          'Loss {loss.val: .4f} ({loss.avg: .4f})\t'.format(
+                           epoch, i, len(train_loader), current_iter, loss=losses))
+
+            # log
+            info = {
+                'loss': loss.item(),
+                'psnr': cur_psnr,
+                'ssim': cur_ssim
+            }
+            for tag, value in info.items():
+                logger.scalar_summary(tag, value, current_iter)
+
+            if current_iter % args.save_freq == 0:
+                    is_best = (cur_psnr > best_psnr)
+                    best_psnr = max(cur_psnr, best_psnr)
+                    #model_cpu = {k: v.cpu() for k, v in model.state_dict().items()}
+                    save_checkpoint({
+                        'epoch': epoch + 1,
+                        'iter': current_iter,
+                        'arch': args.model,
+                        'state_dict': model.state_dict(),
+                        'best_psnr': best_psnr,
+                        'optimizer' : optimizer.state_dict(),
+                    }, is_best, args = args)
+
+        print('Saving the final model.')
+
+
 
 
 def validate(val_loader, model, criterion, args):
     batch_time = AverageMeter('Time', ':6.3f')
     losses = AverageMeter('Loss', ':.4e')
-
+    psnrs = AverageMeter("PSNR", ':.4e')
+    ssims = AverageMeter("SSIM", ':.4e')
     progress = ProgressMeter(
         len(val_loader),
         [batch_time, losses],
@@ -237,14 +220,22 @@ def validate(val_loader, model, criterion, args):
     with torch.no_grad():
         end = time.time()
         for i, (images, target) in enumerate(val_loader):
-            if args.gpu_id is not None:
-                images = images.cuda(args.gpu_id, non_blocking=True)
-            if torch.cuda.is_available():
-                target = target.cuda(args.gpu_id, non_blocking=True)
+
+            images = images.to(device)
+            target = target.to(device)
 
             # compute output
             output = model(images)
             loss = criterion(output, target)
+
+            #PSNR & SSIM
+            mse = criterion(output, target).item()
+            psnr = PSNR(mse)
+            # Add SSIM Function
+            psnrs.update(psnr, gt.size(0))
+            ssims.update(ssim, gt.size(0))
+            print('Iter: [{0}][{1}/{2}]//[{3}/{4}]\t''TEST PSNR//Test SSIM: ({psnrs.val: .4f}, {psnrs.avg: .4f}) \t''TEST PSNR: ({ssims.val: .4f}, {ssims.avg: .4f} \t'.format(
+                   iter, i, len(valid_loader), psnrs=psnrs, ssims=ssims))
 
             # measure accuracy and record loss
             losses.update(loss.item(), images.size(0))
@@ -260,7 +251,7 @@ def validate(val_loader, model, criterion, args):
         print(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'
               .format(top1=top1, top5=top5))
 
-    return top1.avg
+    return psnrs.avg, ssims.avg
 
 def save_checkpoint(state, is_best, args):
     filename = '{}/{}_checkpoint_{}k.path'.format(args.save_path, args.post, state['iter']/1000)
