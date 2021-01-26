@@ -234,8 +234,8 @@ def validate(val_loader, model, criterion, args):
             # Add SSIM Function
             psnrs.update(psnr, gt.size(0))
             ssims.update(ssim, gt.size(0))
-            print('Iter: [{0}][{1}/{2}]//[{3}/{4}]\t''TEST PSNR//Test SSIM: ({psnrs.val: .4f}, {psnrs.avg: .4f}) \t''TEST PSNR: ({ssims.val: .4f}, {ssims.avg: .4f} \t'.format(
-                   iter, i, len(valid_loader), psnrs=psnrs, ssims=ssims))
+            print('Iter: [{0}][{1}/{2}]\t''TEST PSNR: ({psnrs.val: .4f}, {psnrs.avg: .4f})\t''TEST SSIM: ({ssims.val: .4f}, {ssims.avg: .4f})\t'.format(
+                    iter, i, len(valid_loader), psnrs=psnrs, ssims=ssims))
 
             # measure accuracy and record loss
             losses.update(loss.item(), images.size(0))
