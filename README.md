@@ -2,7 +2,7 @@
 
 ## Updated
 
-I downloaded every dataset to "/home/wooyeong/Burst/dataset/" (21.01.27)
+I downloaded every dataset to "/home/wooyeong/Burst/burstsr_dataset/" (21.01.27)
 
 ## Dates
 * 2021.01.26 Release of train and validation data  
