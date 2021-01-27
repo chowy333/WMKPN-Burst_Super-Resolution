@@ -4,6 +4,13 @@
 
 I downloaded every dataset to "/home/wooyeong/Burst/burstsr_dataset/" (21.01.27)
 
+## Data Configuration
+
+**Zurich** : dir = "/home/wooyeong/Burst/burstsr_dataset/Zurich_Public/" , train = 46839, test = 1204 rgb_image
+
+* 우리가 해야할 task :  "/home/wooyeong/Burst/burstsr_dataset/syn_burst_val/"에 있는 300 묶음에 대해 validation을 해줘야함 
+* (LR burst = 14, size = 48 x 48 x 4) * 300 => (HR size = 384 x 384 x 3) 300개
+
 ## Dates
 * 2021.01.26 Release of train and validation data  
 * 2021.02.01 Validation server online  
