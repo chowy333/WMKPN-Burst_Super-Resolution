@@ -24,15 +24,18 @@ class Tf_Logger(object):
 
     def image_summary(self, tag, images, step):
         """Log a list of images."""
-        for i, img in enumerate(images):
-            if len(img.shape) == 2:
-                img = img[np.newaxis, :,:]
-            elif len(img.shape) == 3:
-                print(img.shape)
-                pass
-                # img = img[np.newaxis,:,:,:]
-            self.writer.add_image('%s/%d' % (tag, i), img, step)
-        # with self.writer.as_default():
+        self.writer.add_images(tag, images, step)
+
+
+        #for i, img in enumerate(images):
+        #    if len(img.shape) == 2:
+        #        img = img[np.newaxis, :,:]
+        #    elif len(img.shape) == 3:
+        #        print(img.shape)
+        #        pass
+        #        # img = img[np.newaxis,:,:,:]
+
+        ## with self.writer.as_default():
         #     for i, img in enumerate(images):
         #         if len(img.shape) == 2:
         #             img = img[np.newaxis,:,:,np.newaxis]

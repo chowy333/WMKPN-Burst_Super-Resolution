@@ -1,17 +1,18 @@
 import os
 
-
 class BaseArgs():
     def __init__(self):
         self.initialized = False
 
     def initialize(self, parser):
         # datasets args
-        parser.add_argument('--train_list', type=str,
-                            default='datasets/train_df2k.txt',  help='path to train list')
-        parser.add_argument('--valid_list', type=str,
-                            default='datasets/valid_df2k.txt', help='path to valid list')
-        parser.add_argument('--evaluate', action='store_true', help='Just evaluate store_true')
+        parser.add_argument('--train_path', type=str,
+                            default='/home/wooyeong/Burst/burstsr_dataset/Zurich_Public',  help='path to train')
+        #parser.add_argument('--valid_path', type=str,
+        #                    default='datasets/valid_df2k.txt', help='path to valid')
+        parser.add_argument('--split_ratio', default=0.8, type=float, help='train dataset split ratio')
+
+        parser.add_argument('--evaluate', action='store_true', help='test')
 
 
         parser.add_argument('--denoise', action='store_true',  help='denoise store_true')
@@ -21,17 +22,17 @@ class BaseArgs():
         parser.add_argument('--batch_size', default=16, type=int, help='mini-batch size (default:8)')
         parser.add_argument('--num_workers', default=8, type=int, help='number of data loading workers (default: 8)')
         parser.add_argument('--patch_size', default=256, type=int, help='height of patch (default: 64)')
-
-        parser.add_argument('--in_channels', default=1, type=int, help='in_channels')
+        parser.add_argument('--num_seq', default=14, type=int, help='height of patch (default: 64)')
+        parser.add_argument('--in_channels', default=4, type=int, help='in_channels')
         parser.add_argument('--gt_channels', default=3, type=int, help='gt_channels')
         #parser.add_argument('--get2label', action='store_true',  help='denoise store_true')
         #parser.add_argument('--bayer_only', action='store_true',  help='get only raw images')
 
 
         # train args
-        parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
+        parser.add_argument('--start_epoch', default=1, type=int, metavar='N',
                             help='manual epoch number (useful on restarts)')
-        parser.add_argument('--total_epochs', default=10000, type=int,
+        parser.add_argument('--end_epochs', default=10000, type=int,
                             help='number of total epochs to run')
         parser.add_argument('--total_iters', default=10000000, type=int,
                             help='number of total epochs to run')
@@ -49,20 +50,20 @@ class BaseArgs():
         parser.add_argument('--valid_freq', default=5000, type=int,
                             help='epoch interval for valid (default:5000)')
         # logger parse
-        parser.add_argument('--print_freq', default=20, type=int,
+        parser.add_argument('--print_freq', default=100, type=int,
                             help='print frequency (default: 100)')
         parser.add_argument('--postname', type=str, default='',
                             help='postname of save model')
         parser.add_argument('--save_path', type=str, default='./ckpts',
                             help='path of save model')
-        parser.add_argument('--save_freq', default=10, type=int,
-                            help='save ckpoints frequency')
-        parser.add_argument('--logdir', default='./output/log_jupyter', type=str,
+        parser.add_argument('--save_freq', default=100000, type=int,
+                            help='save ckpoints frequency (default: 100000)')
+        parser.add_argument('--logdir', default='./logs', type=str,
                             help='log dir')
         # model args
         parser.add_argument('--pretrained_model', default='', type=str,
                             help='path to pretrained model(default: none)')
-        parser.add_argument('--model', default='demo', type=str,
+        parser.add_argument('--model', default='ours', type=str,
                             help='model name (default: none)')
         parser.add_argument('--norm_type', default=None, type=str,
                             help='dm_block_type(default: rrdb)')
@@ -72,18 +73,23 @@ class BaseArgs():
                             help='activation layer {relu, prelu, leakyrelu}')
         parser.add_argument('--bias', action='store_true',
                             help='bias of layer')
-        parser.add_argument('--channels', default=64, type=int,
-                            help='channels')
+        parser.add_argument('--filters', default=64, type=int,
+                            help='filters')
+        parser.add_argument('--reduction', default=8, type=int,
+                            help='Squeeze and Excitation')
+
         # for single task
         parser.add_argument('--n_resblocks', default=6, type=int,
                             help='number of basic blocks')
         # for joint task
+        parser.add_argument('--num_rfab', default=8, type=int,
+                            help='number of  residual feature attention block')
         parser.add_argument('--sr_n_resblocks', default=6, type=int,
-                            help='number of super-resolution blocks')
+                            help='number of demosaicking blocks')
         parser.add_argument('--dm_n_resblocks', default=6, type=int,
                             help='number of demosaicking blocks')
         # for super-resolution
-        parser.add_argument('--scale', default=2, type=int,
+        parser.add_argument('--scale', default=4, type=int,
                             help='Scale of Super-resolution.')
         parser.add_argument('--downsampler', default='avg', type=str,
                             help='downsampler of Super-resolution.')
@@ -115,19 +121,17 @@ class BaseArgs():
         # self.args = parser.parse_args(args[0)
 
         if self.args.denoise:
-            self.args.post = self.args.model + '-dn-'+ self.args.train_list.split('/')[-1].split('.')[0].split('_')[-1]+'x'\
-                             + str(self.args.n_resblocks)+'-'+str(self.args.sr_n_resblocks)+'-'+str(self.args.dm_n_resblocks)\
-                             +'-'+str(self.args.channels) + '-' + str(self.args.scale) + '-' + self.args.block_type
+            self.args.post = self.args.model + '-dn-'+ self.args.train_path.split('/')[-1]\
+                             +'-'+str(self.args.num_rfab)\
+                             +'-'+str(self.args.filters) + '-' +'x'+ str(self.args.scale)
         else:
-            self.args.post = self.args.model + '-'+ self.args.train_list.split('/')[-1].split('.')[0].split('_')[-1]+'x'\
-                             + str(self.args.n_resblocks)+'-'+str(self.args.sr_n_resblocks)+'-'+str(self.args.dm_n_resblocks)\
-                             +'-'+str(self.args.channels) + '-' + str(self.args.scale) + '-' + self.args.block_type
+            self.args.post = self.args.model + self.args.train_path.split('/')[-1]\
+                             +'-'+str(self.args.num_rfab)\
+                             +'-'+str(self.args.filters) + '-' +'x'+ str(self.args.scale)
         if self.args.postname:
             self.args.post = self.args.post +'-' + self.args.postname
         if self.args.flag:
             self.args.post = self.args.post +'-' + self.args.flag
-        self.args.save_path = 'checkpoints/checkpoints'+'-'+self.args.post
-        self.args.logdir = 'logs/'+self.args.post
 
         self.initialized = True
         return self.args
@@ -148,5 +152,5 @@ class BaseArgs():
         if not os.path.exists(self.args.save_path):
             os.makedirs(self.args.save_path)
 
-        assert os.path.exists(self.args.train_list), 'train_list {} not found'.format(self.args.train_list)
-        assert os.path.exists(self.args.valid_list), 'valid_list {} not found'.format(self.args.valid_list)
+        assert os.path.exists(self.args.train_path), 'train_list {} not found'.format(self.args.train_path)
+        #assert os.path.exists(self.args.valid_path), 'valid_list {} not #found'.format(self.args.valid_path)

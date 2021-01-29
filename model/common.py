@@ -6,7 +6,13 @@ import torch.nn as nn
 ##############################
 #    Basic layer
 ##############################
-def act_layer(act_type, inplace=False, neg_slope=0.2, n_prelu=1):
+def conv3d_weightnorm(in_filters, out_filters, kernel_size, stride = 1, padding = 1, bias = False):
+    return nn.utils.weight_norm(nn.Conv3d(in_filters, out_filters, kernel_size, stride = stride, padding=padding, bias = bias))
+
+def conv2d_weightnorm(in_filters, out_filters, kernel_size, stride = 1, padding = 1, bias = False):
+    return nn.utils.weight_norm(nn.Conv2d(in_filters, out_filters, kernel_size, stride = stride, padding=padding, bias = bias))
+
+def act_layer(act_type, inplace= True, neg_slope=0.2, n_prelu=1):
     # helper selecting activation
     # neg_slope: for leakyrelu and init of prelu
     # n_prelu: for p_relu num_parameters
@@ -34,6 +40,127 @@ def norm_layer(norm_type, nc):
     else:
         raise NotImplementedError('normalization layer [%s] is not found' % norm_type)
     return layer
+
+#def reflective_padding(tensor, padding):
+#    B, F, N, H, W = tensor.shape
+#    re_shaped = tensor.view(B, -1, H, W)
+#    """Reflecting padding on H and W dimension"""
+#    return nn.ReflectionPad2d((padding, padding, padding, padding))(re_shaped).view(B, F, N, H+2, W+2)
+
+class Ref_pad(nn.Module):
+    def __init__(self, L_pad =1, R_pad =1, T_pad= 1, B_pad = 1):
+        super(Ref_pad, self).__init__()
+
+        self.L_pad = L_pad
+        self.R_pad = R_pad
+        self.T_pad = T_pad
+        self.B_pad = B_pad
+
+        self.pad = nn.ReflectionPad2d((L_pad, R_pad, T_pad, B_pad))
+
+    def forward(self, x):
+        B, F, N, H, W = x.shape
+        reshaped = torch.reshape(x, (B, -1, H, W))
+        x = self.pad(reshaped)
+        return x.view(B, F, N, H + self.T_pad + self.B_pad, W + self.L_pad + self.R_pad)
+
+
+
+class ConvBlock_2D(nn.Sequential):
+    def __init__(
+        self, in_feat, out_feat, kernel_size=3, stride=1, padding = 1, bias=False,
+            norm_type=False, act_type='relu'):
+
+        m = [conv2d_weightnorm(in_feat, out_feat, kernel_size, stride=stride, padding = padding, bias=bias)]
+        act = act_layer(act_type) if act_type else None
+        norm = norm_layer(norm_type, out_channels) if norm_type else None
+        if norm:
+            m.append(norm)
+        if act is not None:
+            m.append(act)
+        super(ConvBlock_2D, self).__init__(*m)
+
+class ConvBlock_3D(nn.Sequential):
+    def __init__(
+        self, in_feat, out_feat, kernel_size=3, stride=1, padding=1, bias=False,
+            norm_type=False, act_type='relu', is_rpad = True):
+
+        if is_rpad :
+            m = [Ref_pad()]
+        else:
+            m = []
+        m += [conv3d_weightnorm(in_feat, out_feat, kernel_size, stride = stride, padding = padding, bias = bias)]
+        act = act_layer(act_type) if act_type else None
+        norm = norm_layer(norm_type, out_channels) if norm_type else None
+        if norm:
+            m.append(norm)
+        if act is not None:
+            m.append(act)
+        super(ConvBlock_3D, self).__init__(*m)
+
+class RFAB(nn.Module):
+    def __init__(self, n_feats = 32, kernel_size=3, norm_type=False, act_type='relu', bias= False, reduction= 8):
+
+        super(RFAB, self).__init__()
+
+        act = act_layer(act_type) if act_type else None
+
+        m = []
+        m.append(conv3d_weightnorm(n_feats, n_feats, kernel_size, bias=bias))
+        m.append(act)
+        m.append(conv3d_weightnorm(n_feats, n_feats, kernel_size, bias=bias))
+
+        n = []
+        n.append(conv3d_weightnorm(n_feats, n_feats//reduction, 1, padding = 0, bias=bias))
+        n.append(act)
+        n.append(conv3d_weightnorm(n_feats//reduction, n_feats, 1, padding = 0,  bias=bias))
+        n.append(act_layer("sigmoid"))
+
+        self.conv_b1 = nn.Sequential(*m)
+        self.avg_pool = nn.AdaptiveAvgPool3d(1)
+        self.conv_b2 = nn.Sequential(*n)
+
+    def forward(self, x):
+        x_res = x
+        x = self.conv_b1(x)
+        x_to_scale = x
+        x = self.avg_pool(x)
+        x = self.conv_b2(x)
+        x_scaled = x_to_scale * x
+        return x_scaled + x_res
+
+class RTAB(nn.Module):
+    def __init__(self, n_feats = 14, kernel_size=3, norm_type=False, act_type='relu', bias= False, reduction= 8): # 9는 burst frame 개수
+
+        super(RTAB, self).__init__()
+
+        act = act_layer(act_type) if act_type else None
+
+        m = []
+        m.append(conv2d_weightnorm(n_feats, n_feats, kernel_size, bias=bias))
+        m.append(act)
+        m.append(conv2d_weightnorm(n_feats, n_feats, kernel_size, bias=bias))
+
+        n = []
+        n.append(conv2d_weightnorm(n_feats, n_feats//reduction, 1, padding = 0, bias=bias))
+        n.append(act)
+        n.append(conv2d_weightnorm(n_feats//reduction, n_feats, 1, padding = 0,  bias=bias))
+        n.append(act_layer("sigmoid"))
+
+        self.conv_b1 = nn.Sequential(*m)
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        self.conv_b2 = nn.Sequential(*n)
+
+    def forward(self, x):
+
+        x_res = x
+        x = self.conv_b1(x)
+        x_to_scale = x
+        x = self.avg_pool(x)
+        x = self.conv_b2(x)
+
+        x_scaled = x_to_scale * x
+        return x_scaled + x_res
 
 
 def default_conv(in_channelss, out_channels, kernel_size, stride=1, bias=False):
