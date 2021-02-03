@@ -207,13 +207,13 @@ def main():
 def validate(val_loader, model, criterion, current_iter, device, logger, args):
     losses = AverageMeter('Val_Loss', ':.4e')
     psnrs = AverageMeter("PSNR", ':.4e')
-    metric = PSNR()
+    metric = PSNR(boundary_ignore=40)
     #ssims = AverageMeter("SSIM", ':.4e')
 
     model.eval()
 
     with torch.no_grad():
-        end = time.time()
+
         for i, (burst, frame_gt, flow_vectors, meta_info) in enumerate(val_loader):
 
             bst = burst.permute(0,2,1,3,4).to(device)

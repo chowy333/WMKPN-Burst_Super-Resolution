@@ -1,9 +1,10 @@
 import torch.nn.functional as F
 import cv2
+import os
 from datasets.synthetic_burst_val_set import SyntheticBurstVal
 import torch
 import numpy as np
-import os
+
 
 
 class SimpleBaseline:
@@ -17,9 +18,13 @@ class SimpleBaseline:
         return burst_rgb
 
 
+
 def main():
-    dataset = SyntheticBurstVal('PATH_TO_SyntheticBurstVal')
-    out_dir = 'PATH_WHERE_RESULTS_ARE_SAVED'
+
+    val_dir = "/home/wooyeong/Burst/burstsr_dataset/syn_burst_val/"
+
+    dataset = SyntheticBurstVal(val_dir)
+    out_dir = '/home/wooyeong/Burst/burstsr_dataset/val_out_BL/'
 
     # TODO Set your network here
     net = SimpleBaseline()

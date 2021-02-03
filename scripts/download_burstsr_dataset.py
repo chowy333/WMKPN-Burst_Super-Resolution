@@ -57,10 +57,10 @@ def download_burstsr_dataset(download_path):
 
 
 def main():
-    #parser = argparse.ArgumentParser(description='Downloads and unpacks BurstSR dataset')
-    #parser.add_argument('path', type=str, help='Path where the dataset will be downloaded')
+    parser = argparse.ArgumentParser(description='Downloads and unpacks BurstSR dataset')
+    parser.add_argument('path', type=str, help='Path where the dataset will be downloaded')
 
-    #args = parser.parse_args()
+    args = parser.parse_args()
 
     path = "/home/wooyeong/Burst"
 

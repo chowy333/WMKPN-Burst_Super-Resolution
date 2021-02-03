@@ -1,5 +1,5 @@
 import os
-
+import datetime
 class BaseArgs():
     def __init__(self):
         self.initialized = False
@@ -137,20 +137,29 @@ class BaseArgs():
         return self.args
 
     def print_args(self):
+        # making foot print
+        now = datetime.datetime.now()
+        fw = open("footprint_{}.txt".format(self.args.post), "w")
+        fw.write("Datetime : {}\n".format(now))
+        fw.close()
         # print args
         print("==========       CONFIG      =============")
         for arg, content in self.args.__dict__.items():
             print("{}:{}".format(arg, content))
         print("\n")
         print("==========     CONFIG END    =============")
+
+
+
+
         # check for folders existence
         if os.path.exists(self.args.logdir):
             cmd = 'rm -rf ' + self.args.logdir
             os.system(cmd)
-        os.makedirs(self.args.logdir)
+        os.makedirs(os.path.join(self.args.logdir, self.args.post))
 
-        if not os.path.exists(self.args.save_path):
-            os.makedirs(self.args.save_path)
+        if not os.path.exists(os.path.join(self.args.save_path, self.args.post)):
+            os.makedirs(os.path.join(self.args.save_path, self.args.post))
 
         assert os.path.exists(self.args.train_path), 'train_list {} not found'.format(self.args.train_path)
         #assert os.path.exists(self.args.valid_path), 'valid_list {} not #found'.format(self.args.valid_path)
