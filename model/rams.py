@@ -12,9 +12,9 @@ num_seqs = 9 # temporal
 r = 8
 scaled = 4
 
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-input = torch.randn((16, 1, 9 ,48, 48)).to(device)
+#os.environ["CUDA_VISIBLE_DEVICES"]="0"
+#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#input = torch.randn((16, 1, 9 ,48, 48)).to(device)
 input = torch.randn((16, 1, 9 ,48, 48))
 input.permute(0,2,1,3,4).shape
 class RAMS(nn.Module):
@@ -70,11 +70,16 @@ class RAMS(nn.Module):
 
     def forward(self, x):
         x = self.head(x)
+        print("head = ", x.shape)
         x_res = x
         x = self.trunk_rfab(x)
+        print("trunk_rfab = ", x.shape)
         x = x + x_res
+
         x = self.trunk_trb(x)
+        print("trunk_trb = ", x.shape)
         x = self.tail_conv(x)
+        print("tail_conv = ", x.shape)
         sr_output = self.tail_ps(torch.squeeze(x, 2))
         return sr_output
 
@@ -115,7 +120,7 @@ def norm_layer(norm_type, nc):
         raise NotImplementedError('normalization layer [%s] is not found' % norm_type)
     return layer
 
-model = RAMS().to(device)
+model = RAMS()#.to(device)
 model(input).shape
 
 #del(input)

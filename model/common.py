@@ -2,7 +2,7 @@ import math
 
 import torch
 import torch.nn as nn
-
+import torch.nn.functional as F
 ##############################
 #    Basic layer
 ##############################
@@ -64,7 +64,22 @@ class Ref_pad(nn.Module):
         x = self.pad(reshaped)
         return x.view(B, F, N, H + self.T_pad + self.B_pad, W + self.L_pad + self.R_pad)
 
+class Zero_pad(nn.Module):
+    def __init__(self, L_pad =1, R_pad =1, T_pad= 1, B_pad = 1):
+        super(Zero_pad, self).__init__()
 
+        self.L_pad = L_pad
+        self.R_pad = R_pad
+        self.T_pad = T_pad
+        self.B_pad = B_pad
+
+        self.pad = nn.ZeroPad2d((L_pad, R_pad, T_pad, B_pad))
+
+    def forward(self, x):
+        B, F, N, H, W = x.shape
+        reshaped = torch.reshape(x, (B, -1, H, W))
+        x = self.pad(reshaped)
+        return x.view(B, F, N, H + self.T_pad + self.B_pad, W + self.L_pad + self.R_pad)
 
 class ConvBlock_2D(nn.Sequential):
     def __init__(
@@ -86,7 +101,7 @@ class ConvBlock_3D(nn.Sequential):
             norm_type=False, act_type='relu', is_rpad = True):
 
         if is_rpad :
-            m = [Ref_pad()]
+            m = [Zero_pad()]
         else:
             m = []
         m += [conv3d_weightnorm(in_feat, out_feat, kernel_size, stride = stride, padding = padding, bias = bias)]
@@ -212,9 +227,42 @@ class ESA(nn.Module):
         res2 = res1 + res
         res3 = self.conv1_1_2(res2)
         attn_mask = self.act(res3)
+        print(attn_mask.shape)
         output = attn_mask * x
         return output
 
+#class ESA(nn.Module):
+#     def __init__(self, n_feats, conv=default_conv):
+#         super(ESA, self).__init__()
+#         f = n_feats // 4
+#         self.conv1 = conv(n_feats, f, kernel_size=1)
+#         self.conv_f = conv(f, f, kernel_size=1)
+#         self.conv_max = conv(f, f, kernel_size=3, padding=1)
+#         self.conv2 = conv(f, f, kernel_size=3, stride=2, padding=0)
+#         self.conv3 = conv(f, f, kernel_size=3, padding=1)
+#         self.conv3_ = conv(f, f, kernel_size=3, padding=1)
+#         self.conv4 = conv(f, n_feats, kernel_size=1)
+#         self.sigmoid = nn.Sigmoid()
+#         self.relu = nn.ReLU(inplace=True)
+#
+#     def forward(self, x, f):
+#         c1_ = (self.conv1(f))
+#         c1 = self.conv2(c1_)
+#         v_max = F.max_pool2d(c1, kernel_size=7, stride=3)
+#         v_range = self.relu(self.conv_max(v_max))
+#         c3 = self.relu(self.conv3(v_range))
+#         c3 = self.conv3_(c3)
+#         c3 = F.interpolate(c3, (x.size(2), x.size(3)), mode='bilinear')
+#         cf = self.conv_f(c1_)
+#         c4 = self.conv4(c3+cf)
+#         m = self.sigmoid(c4)
+#         print("m = ", m.shape)
+#
+#         return x * m
+#def default_conv(in_channels, out_channels, kernel_size, stride=1, padding=None, bias=True, groups=1):
+#       if not padding and stride==1:
+#           padding = kernel_size // 2
+#       return nn.Conv2d(in_channels, out_channels, kernel_size, stride=stride, padding=padding, bias=bias, groups=groups)
 #import torch
 #import torch.nn as nn
 #input_shape = (1,64,48,48)
@@ -238,7 +286,27 @@ class ESA(nn.Module):
 #x.shape
 #upsample = nn.Upsample(scale_factor = 6, mode = "nearest")
 #upsample(x).shape
-#ESA()(input).shape
+#ESA(64)(input, input).shape
+
+
+class ChannelPool(nn.Module):
+    def forward(self, x):
+        return torch.cat( (torch.max(x,1)[0].unsqueeze(1), torch.mean(x,1).unsqueeze(1)), dim=1 )
+
+class SpatialGate(nn.Module):
+    def __init__(self):
+        super(SpatialGate, self).__init__()
+        kernel_size = 7
+        self.compress = ChannelPool()
+        self.spatial = ConvBlock_2D(2, 1, kernel_size, stride=1, padding=(kernel_size-1) // 2, act_type=None)
+    def forward(self, x):
+        x_compress = self.compress(x)
+        x_out = self.spatial(x_compress)
+        scale = F.sigmoid(x_out) # broadcasting
+        print("scale", scale.shape)
+        return x * scale
+#SpatialGate()(input).shape
+
 class RFABlock(nn.Module):
     def __init__(
         self, n_feats = 64, kernel_size=3,

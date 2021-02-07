@@ -1,5 +1,6 @@
 import argparse
 import os
+import sys
 import random
 import shutil
 import time
@@ -113,7 +114,7 @@ def main():
     best_psnr = 0
     batch_time = AverageMeter('Time', ':6.3f')
     data_time = AverageMeter('Data', ':6.3f')
-    logger = Tf_Logger(args.logdir)
+    logger = Tf_Logger(os.path.join(args.logdir, args.post))
     losses = AverageMeter('Loss', ':.4e')
 
     print('---------- Start training -------------')
@@ -155,6 +156,7 @@ def main():
 
             # compute output
             output = model(bst)
+            #sys.exit(0)
             #print("output", output.shape)
             loss = criterion(output, target).cuda()
 
@@ -268,10 +270,10 @@ def validate(val_loader, model, criterion, current_iter, device, logger, args):
     return psnrs.avg, losses.avg
 
 def save_checkpoint(state, is_best, args):
-    filename = '{}/{}_checkpoint_{}k.path'.format(args.save_path, args.post, state['iter']/1000)
+    filename = '{}/{}/{}_checkpoint_{}k.path'.format(args.save_path, args.post, args.post, state['iter']/1000)
     torch.save(state, filename)
     if is_best:
-        shutil.copyfile(filename, '{}/{}_model_best.path'.format(args.save_path, args.post))
+        shutil.copyfile(filename, '{}/{}/{}_model_best.path'.format(args.save_path, args.post, args.post))
 
 
 def adjust_learning_rate(optimizer, epoch, args):
