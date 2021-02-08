@@ -99,7 +99,8 @@ class BaseArgs():
         parser.add_argument('--vgg_loss', type=str, default='l1', help="loss L1 or L2 ['l1', 'l2']")
         parser.add_argument('--vgg_layer', type=str, default='5', help='number of threads to prepare data.')
         parser.add_argument('--dm_lambda', type=float, default=0.5, help='dm loss lamda')
-        parser.add_argument('--sr_lambda', type=float, default=0.5, help='sr loss lamda')
+        parser.add_argument('--sr_lambda', type=float, default=1, help='sr loss lamda')
+        parser.add_argument('--ssim_lambda', type=float, default=0, help='ssim loss lamda')
         parser.add_argument('--vgg_lambda', type=float, default=0, help='vgg loss lamda, set 0 if no vgg_loss')
 
         parser.add_argument('--remove', action='store_true', help='remove save_path')
@@ -108,7 +109,7 @@ class BaseArgs():
         parser.add_argument('--seed', default=0, type=int, help='seed')
         parser.add_argument('--gpu_id', default='2', type=str, help='GPU Index')
         parser.add_argument('--cl_weights', default='1,1,1,1', type=str, help='curriculum learning weight')
-        parser.add_argument('--ssim_lambda', type=float, default=0, help='ssim loss lamda')
+
         parser.add_argument('--num_steps', default=4, type=int, help='feedback count')
         parser.add_argument('--custom_lr_path', type=str, default=None, help='path of custom lr image')
         parser.add_argument('--custom_lr_train_dir', type=str, default='PixelShift200_train_crop_lr')
@@ -153,8 +154,8 @@ class BaseArgs():
 
 
         # check for folders existence
-        if os.path.exists(self.args.logdir):
-            cmd = 'rm -rf ' + self.args.logdir
+        if os.path.exists(os.path.join(self.args.logdir, self.args.post)):
+            cmd = 'rm -rf ' + os.path.join(self.args.logdir, self.args.post)
             os.system(cmd)
         os.makedirs(os.path.join(self.args.logdir, self.args.post))
 

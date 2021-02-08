@@ -1,0 +1,443 @@
+Datetime : 2021-02-08 11:31:46.510798
+==========       CONFIG      =============
+train_path:/home/samsung/wycho/datasets/Zurich_Public/
+split_ratio:0.8
+evaluate:False
+denoise:False
+max_noise:0.0748
+min_noise:0.0
+batch_size:16
+num_workers:8
+patch_size:256
+num_seq:14
+in_channels:4
+gt_channels:3
+start_epoch:1
+end_epochs:10000
+total_iters:10000000
+start_iters:0
+lr_adjust_freq:200000
+lr:0.0001
+resume:
+valid_freq:5000
+print_freq:100
+postname:
+save_path:./ckpts
+save_freq:100000
+logdir:./logs
+pretrained_model:
+model:baseline
+norm_type:None
+block_type:rrdb
+act_type:relu
+bias:True
+filters:64
+reduction:8
+n_resblocks:6
+num_rfab:13
+sr_n_resblocks:6
+dm_n_resblocks:6
+scale:4
+downsampler:avg
+vgg_path:/mnt/lustre/qianguocheng/codefiles/vgg19.pth
+vgg_loss:l1
+vgg_layer:5
+dm_lambda:0.5
+sr_lambda:0.5
+ssim_lambda:0.5
+vgg_lambda:0
+remove:False
+flag:None
+bayer_mode:rggb
+seed:0
+gpu_id:2
+cl_weights:1,1,1,1
+num_steps:4
+custom_lr_path:None
+custom_lr_train_dir:PixelShift200_train_crop_lr
+custom_lr_valid_dir:PixelShift200_valid_crop_lr
+post:baseline-13-64-x4
+
+
+==========     CONFIG END    =============
+===> Loading the network ...
+NET(
+  (head): Sequential(
+    (0): ConvBlock_3D(
+      (0): Zero_pad(
+        (pad): ZeroPad2d(padding=(1, 1, 1, 1), value=0.0)
+      )
+      (1): Conv3d(4, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+    )
+  )
+  (trunk_rfab): Sequential(
+    (0): RFAB(
+      (conv_b1): Sequential(
+        (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      )
+      (avg_pool): AdaptiveAvgPool3d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv3d(64, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(8, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (3): Sigmoid()
+      )
+    )
+    (1): RFAB(
+      (conv_b1): Sequential(
+        (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      )
+      (avg_pool): AdaptiveAvgPool3d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv3d(64, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(8, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (3): Sigmoid()
+      )
+    )
+    (2): RFAB(
+      (conv_b1): Sequential(
+        (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      )
+      (avg_pool): AdaptiveAvgPool3d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv3d(64, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(8, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (3): Sigmoid()
+      )
+    )
+    (3): RFAB(
+      (conv_b1): Sequential(
+        (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      )
+      (avg_pool): AdaptiveAvgPool3d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv3d(64, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(8, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (3): Sigmoid()
+      )
+    )
+    (4): RFAB(
+      (conv_b1): Sequential(
+        (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      )
+      (avg_pool): AdaptiveAvgPool3d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv3d(64, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(8, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (3): Sigmoid()
+      )
+    )
+    (5): RFAB(
+      (conv_b1): Sequential(
+        (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      )
+      (avg_pool): AdaptiveAvgPool3d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv3d(64, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(8, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (3): Sigmoid()
+      )
+    )
+    (6): RFAB(
+      (conv_b1): Sequential(
+        (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      )
+      (avg_pool): AdaptiveAvgPool3d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv3d(64, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(8, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (3): Sigmoid()
+      )
+    )
+    (7): RFAB(
+      (conv_b1): Sequential(
+        (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      )
+      (avg_pool): AdaptiveAvgPool3d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv3d(64, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(8, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (3): Sigmoid()
+      )
+    )
+    (8): RFAB(
+      (conv_b1): Sequential(
+        (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      )
+      (avg_pool): AdaptiveAvgPool3d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv3d(64, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(8, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (3): Sigmoid()
+      )
+    )
+    (9): RFAB(
+      (conv_b1): Sequential(
+        (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      )
+      (avg_pool): AdaptiveAvgPool3d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv3d(64, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(8, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (3): Sigmoid()
+      )
+    )
+    (10): RFAB(
+      (conv_b1): Sequential(
+        (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      )
+      (avg_pool): AdaptiveAvgPool3d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv3d(64, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(8, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (3): Sigmoid()
+      )
+    )
+    (11): RFAB(
+      (conv_b1): Sequential(
+        (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      )
+      (avg_pool): AdaptiveAvgPool3d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv3d(64, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(8, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (3): Sigmoid()
+      )
+    )
+    (12): RFAB(
+      (conv_b1): Sequential(
+        (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      )
+      (avg_pool): AdaptiveAvgPool3d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv3d(64, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(8, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (3): Sigmoid()
+      )
+    )
+    (13): ConvBlock_3D(
+      (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+    )
+  )
+  (trunk_trb): Sequential(
+    (0): Zero_pad(
+      (pad): ZeroPad2d(padding=(1, 1, 1, 1), value=0.0)
+    )
+    (1): RFAB(
+      (conv_b1): Sequential(
+        (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      )
+      (avg_pool): AdaptiveAvgPool3d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv3d(64, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(8, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (3): Sigmoid()
+      )
+    )
+    (2): ConvBlock_3D(
+      (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1))
+      (1): ReLU(inplace=True)
+    )
+    (3): Zero_pad(
+      (pad): ZeroPad2d(padding=(1, 1, 1, 1), value=0.0)
+    )
+    (4): RFAB(
+      (conv_b1): Sequential(
+        (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      )
+      (avg_pool): AdaptiveAvgPool3d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv3d(64, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(8, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (3): Sigmoid()
+      )
+    )
+    (5): ConvBlock_3D(
+      (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1))
+      (1): ReLU(inplace=True)
+    )
+    (6): Zero_pad(
+      (pad): ZeroPad2d(padding=(1, 1, 1, 1), value=0.0)
+    )
+    (7): RFAB(
+      (conv_b1): Sequential(
+        (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      )
+      (avg_pool): AdaptiveAvgPool3d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv3d(64, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(8, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (3): Sigmoid()
+      )
+    )
+    (8): ConvBlock_3D(
+      (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1))
+      (1): ReLU(inplace=True)
+    )
+    (9): Zero_pad(
+      (pad): ZeroPad2d(padding=(1, 1, 1, 1), value=0.0)
+    )
+    (10): RFAB(
+      (conv_b1): Sequential(
+        (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      )
+      (avg_pool): AdaptiveAvgPool3d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv3d(64, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(8, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (3): Sigmoid()
+      )
+    )
+    (11): ConvBlock_3D(
+      (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1))
+      (1): ReLU(inplace=True)
+    )
+    (12): Zero_pad(
+      (pad): ZeroPad2d(padding=(1, 1, 1, 1), value=0.0)
+    )
+    (13): RFAB(
+      (conv_b1): Sequential(
+        (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      )
+      (avg_pool): AdaptiveAvgPool3d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv3d(64, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(8, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (3): Sigmoid()
+      )
+    )
+    (14): ConvBlock_3D(
+      (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1))
+      (1): ReLU(inplace=True)
+    )
+    (15): Zero_pad(
+      (pad): ZeroPad2d(padding=(1, 1, 1, 1), value=0.0)
+    )
+    (16): RFAB(
+      (conv_b1): Sequential(
+        (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1), padding=(1, 1, 1))
+      )
+      (avg_pool): AdaptiveAvgPool3d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv3d(64, 8, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (1): ReLU(inplace=True)
+        (2): Conv3d(8, 64, kernel_size=(1, 1, 1), stride=(1, 1, 1))
+        (3): Sigmoid()
+      )
+    )
+    (17): ConvBlock_3D(
+      (0): Conv3d(64, 64, kernel_size=(3, 3, 3), stride=(1, 1, 1))
+      (1): ReLU(inplace=True)
+    )
+  )
+  (tail): Sequential(
+    (0): ConvBlock_2D(
+      (0): Conv2d(128, 1024, kernel_size=(3, 3), stride=(1, 1))
+    )
+  )
+  (deconv): PixelShuffle(upscale_factor=8)
+  (last_conv): ConvBlock_2D(
+    (0): Conv2d(16, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  )
+  (global_res): Sequential(
+    (0): RTAB(
+      (conv_b1): Sequential(
+        (0): Conv2d(896, 896, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (1): ReLU(inplace=True)
+        (2): Conv2d(896, 896, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+      )
+      (avg_pool): AdaptiveAvgPool2d(output_size=1)
+      (conv_b2): Sequential(
+        (0): Conv2d(896, 112, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (1): ReLU(inplace=True)
+        (2): Conv2d(112, 896, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        (3): Sigmoid()
+      )
+    )
+    (1): ConvBlock_2D(
+      (0): Conv2d(896, 1024, kernel_size=(3, 3), stride=(1, 1))
+      (1): ReLU(inplace=True)
+    )
+  )
+)
+  + Number of params: 29.11M
+---------- Start training -------------
+Epoch: [1][99/2342]	Iter:100	Loss  0.1377 ( 0.1742)	sr_loss  0.0323 ( 0.0495)	ssim_loss  0.2431 ( 0.2988)	
+Epoch: [1][199/2342]	Iter:200	Loss  0.0932 ( 0.1478)	sr_loss  0.0293 ( 0.0403)	ssim_loss  0.1572 ( 0.2554)	
+Epoch: [1][299/2342]	Iter:300	Loss  0.1034 ( 0.1341)	sr_loss  0.0306 ( 0.0356)	ssim_loss  0.1761 ( 0.2326)	
+Epoch: [1][399/2342]	Iter:400	Loss  0.0822 ( 0.1255)	sr_loss  0.0169 ( 0.0324)	ssim_loss  0.1476 ( 0.2186)	
+Epoch: [1][499/2342]	Iter:500	Loss  0.0868 ( 0.1185)	sr_loss  0.0191 ( 0.0298)	ssim_loss  0.1545 ( 0.2072)	
+Epoch: [1][599/2342]	Iter:600	Loss  0.0868 ( 0.1136)	sr_loss  0.0203 ( 0.0280)	ssim_loss  0.1532 ( 0.1992)	
+Epoch: [1][699/2342]	Iter:700	Loss  0.0940 ( 0.1099)	sr_loss  0.0183 ( 0.0266)	ssim_loss  0.1697 ( 0.1931)	
+Epoch: [1][799/2342]	Iter:800	Loss  0.0874 ( 0.1064)	sr_loss  0.0186 ( 0.0254)	ssim_loss  0.1561 ( 0.1873)	
+Epoch: [1][899/2342]	Iter:900	Loss  0.0752 ( 0.1035)	sr_loss  0.0138 ( 0.0245)	ssim_loss  0.1367 ( 0.1825)	
+Epoch: [1][999/2342]	Iter:1000	Loss  0.0793 ( 0.1012)	sr_loss  0.0152 ( 0.0237)	ssim_loss  0.1435 ( 0.1786)	
+Epoch: [1][1099/2342]	Iter:1100	Loss  0.0816 ( 0.0992)	sr_loss  0.0167 ( 0.0231)	ssim_loss  0.1465 ( 0.1753)	
+Epoch: [1][1199/2342]	Iter:1200	Loss  0.0761 ( 0.0975)	sr_loss  0.0146 ( 0.0225)	ssim_loss  0.1377 ( 0.1726)	
+Epoch: [1][1299/2342]	Iter:1300	Loss  0.0612 ( 0.0963)	sr_loss  0.0134 ( 0.0221)	ssim_loss  0.1091 ( 0.1704)	
+Epoch: [1][1399/2342]	Iter:1400	Loss  0.0558 ( 0.0950)	sr_loss  0.0113 ( 0.0218)	ssim_loss  0.1002 ( 0.1683)	
+Epoch: [1][1499/2342]	Iter:1500	Loss  0.0573 ( 0.0936)	sr_loss  0.0119 ( 0.0213)	ssim_loss  0.1026 ( 0.1658)	
+Epoch: [1][1599/2342]	Iter:1600	Loss  0.0622 ( 0.0923)	sr_loss  0.0137 ( 0.0210)	ssim_loss  0.1108 ( 0.1637)	
+Epoch: [1][1699/2342]	Iter:1700	Loss  0.0668 ( 0.0913)	sr_loss  0.0130 ( 0.0207)	ssim_loss  0.1206 ( 0.1620)	
+Epoch: [1][1799/2342]	Iter:1800	Loss  0.0627 ( 0.0903)	sr_loss  0.0138 ( 0.0204)	ssim_loss  0.1117 ( 0.1602)	
+Epoch: [1][1899/2342]	Iter:1900	Loss  0.0681 ( 0.0895)	sr_loss  0.0147 ( 0.0201)	ssim_loss  0.1216 ( 0.1588)	
+Epoch: [1][1999/2342]	Iter:2000	Loss  0.1221 ( 0.0887)	sr_loss  0.0256 ( 0.0199)	ssim_loss  0.2186 ( 0.1575)	
+Epoch: [1][2099/2342]	Iter:2100	Loss  0.0895 ( 0.0879)	sr_loss  0.0182 ( 0.0196)	ssim_loss  0.1608 ( 0.1562)	
+Epoch: [1][2199/2342]	Iter:2200	Loss  0.0612 ( 0.0872)	sr_loss  0.0131 ( 0.0194)	ssim_loss  0.1093 ( 0.1550)	
+Epoch: [1][2299/2342]	Iter:2300	Loss  0.0901 ( 0.0866)	sr_loss  0.0194 ( 0.0192)	ssim_loss  0.1608 ( 0.1540)	
+Epoch: [2][57/2342]	Iter:2400	Loss  0.0633 ( 0.0858)	sr_loss  0.0135 ( 0.0190)	ssim_loss  0.1130 ( 0.1527)	

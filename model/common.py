@@ -47,24 +47,39 @@ def norm_layer(norm_type, nc):
 #    """Reflecting padding on H and W dimension"""
 #    return nn.ReflectionPad2d((padding, padding, padding, padding))(re_shaped).view(B, F, N, H+2, W+2)
 
-class Ref_pad(nn.Module):
+#class Ref_pad(nn.Module):
+#    def __init__(self, L_pad =1, R_pad =1, T_pad= 1, B_pad = 1):
+#        super(Ref_pad, self).__init__()
+#
+#        self.L_pad = L_pad
+#        self.R_pad = R_pad
+#        self.T_pad = T_pad
+#        self.B_pad = B_pad
+#
+#        self.pad = nn.ReflectionPad2d((L_pad, R_pad, T_pad, B_pad))
+#
+#    def forward(self, x):
+#        B, F, N, H, W = x.shape
+#        reshaped = torch.reshape(x, (B, -1, H, W))
+#        x = self.pad(reshaped)
+#        return x.view(B, F, N, H + self.T_pad + self.B_pad, W + self.L_pad + self.R_pad)
+
+class Zero_pad(nn.Module):
     def __init__(self, L_pad =1, R_pad =1, T_pad= 1, B_pad = 1):
-        super(Ref_pad, self).__init__()
+        super(Zero_pad, self).__init__()
 
         self.L_pad = L_pad
         self.R_pad = R_pad
         self.T_pad = T_pad
         self.B_pad = B_pad
 
-        self.pad = nn.ReflectionPad2d((L_pad, R_pad, T_pad, B_pad))
+        self.pad = nn.ZeroPad2d((L_pad, R_pad, T_pad, B_pad))
 
     def forward(self, x):
         B, F, N, H, W = x.shape
         reshaped = torch.reshape(x, (B, -1, H, W))
         x = self.pad(reshaped)
         return x.view(B, F, N, H + self.T_pad + self.B_pad, W + self.L_pad + self.R_pad)
-
-
 
 class ConvBlock_2D(nn.Sequential):
     def __init__(
@@ -83,10 +98,10 @@ class ConvBlock_2D(nn.Sequential):
 class ConvBlock_3D(nn.Sequential):
     def __init__(
         self, in_feat, out_feat, kernel_size=3, stride=1, padding=1, bias=False,
-            norm_type=False, act_type='relu', is_rpad = True):
+            norm_type=False, act_type='relu', is_pad = True):
 
-        if is_rpad :
-            m = [Ref_pad()]
+        if is_pad :
+            m = [Zero_pad()]
         else:
             m = []
         m += [conv3d_weightnorm(in_feat, out_feat, kernel_size, stride = stride, padding = padding, bias = bias)]
@@ -128,6 +143,20 @@ class RFAB(nn.Module):
         x = self.conv_b2(x)
         x_scaled = x_to_scale * x
         return x_scaled + x_res
+
+class CSAM(nn.Module):
+    """ Channel-Spatial attention module"""
+    def __init__(self, in_dim):
+        super(CSAM, self).__init__()
+
+        self.conv = nn.Conv3d(in_dim, in_dim, 3, 1, 1)
+        self.gamma = nn.Parameter(torch.zeros(1))
+        self.sigmoid = nn.Sigmoid()
+    def forward(self,x):
+        out = self.sigmoid(self.conv(x))
+        out = self.gamma*out
+        x = x * out + x
+        return x
 
 class RTAB(nn.Module):
     def __init__(self, n_feats = 14, kernel_size=3, norm_type=False, act_type='relu', bias= False, reduction= 8): # 9는 burst frame 개수
@@ -239,6 +268,50 @@ class ESA(nn.Module):
 #upsample = nn.Upsample(scale_factor = 6, mode = "nearest")
 #upsample(x).shape
 #ESA()(input).shape
+
+# 입력 (16, 14, 64, 48, 48) 용도
+#class TCSAB(nn.Module):
+#    def __init__(
+#        self, n_feat = 14, kernel_size = 3, stride = 1, padding = 1, norm_type = False, #act_type = "relu", bias = True, reduction = 6):
+#
+#        super(TCSAB, self).__init__()
+#        modules_body = []
+#
+#        modules_body.append(ConvBlock_3D(n_feat, n_feat, kernel_size = (3,3,3),act_type= #act_type, padding = padding, bias= bias, is_rpad = False))
+#        modules_body.append(conv3d_weightnorm(n_feat, n_feat, kernel_size, stride = stride, #padding = padding, bias = bias))
+#        modules_body.append(RFAB(n_feat, kernel_size, norm_type, act_type, bias, reduction))
+#        modules_body.append(CSAM(n_feat))
+#        self.body = nn.Sequential(*modules_body)
+#
+#    def forward(self, x):
+#        res = self.body(x)
+#        #res = self.body(x).mul(self.res_scale)
+#        res += x
+#        return res
+
+# 입력 (16, 64, 14, 48, 48) 용도
+class TCSAB(nn.Module):
+    def __init__(
+        self, n_feat = 14, kernel_size = 3, stride = 1, padding = 1, norm_type = False, act_type = "relu", bias = True, reduction = 6):
+
+        super(TCSAB, self).__init__()
+        modules_body = []
+
+        modules_body.append(ConvBlock_3D(n_feat, n_feat, kernel_size = (3,3,3),act_type= act_type, padding = padding, bias= bias, is_pad = False))
+        modules_body.append(conv3d_weightnorm(n_feat, n_feat, kernel_size, stride = stride, padding = padding, bias = bias))
+        modules_body.append(RFAB(n_feat, kernel_size, norm_type, act_type, bias, reduction))
+        modules_body.append(CSAM(n_feat))
+        self.body = nn.Sequential(*modules_body)
+
+    def forward(self, x):
+        # 16, 64, 14, 48, 48
+        x = x.permute(0, 2, 1, 3, 4).contiguous()
+        # 16, 14, 64, 48, 48
+        res = self.body(x)
+        #res = self.body(x).mul(self.res_scale)
+        res += x
+        return res.permute(0, 2, 1, 3, 4).contiguous()
+
 class RFABlock(nn.Module):
     def __init__(
         self, n_feats = 64, kernel_size=3,
@@ -455,7 +528,9 @@ class Upsampler(nn.Sequential):
 
         super(Upsampler, self).__init__(*m)
 
-
+a = torch.randn((16, 64, 48, 48))
+Up = Upsampler(4*2, 64)
+Up(a).shape
 class DownsamplingShuffle(nn.Module):
 
     def __init__(self, scale):
