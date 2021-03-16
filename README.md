@@ -25,7 +25,7 @@ We trained our model on synthesis datasets.
  2. run the code with bash
        ```
         sh run_WMKPN.sh 
-        ```
+       ```
  3. Training procedure will be printed in footprint_{model_name}-bs_{batch_size}-{filters}-x{scale}.txt
  4. logs and checkpoint file will be saved on "logs/{args.post}/", "ckpts/{args.post}/" respectively.       
 
