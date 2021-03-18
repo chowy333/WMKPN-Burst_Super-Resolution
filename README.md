@@ -11,7 +11,7 @@
 ### Test Models
 
 - test with pretrained model by synthtic datasets
-   1. check the test image path and output image path
+   1. check the test image path and output image path in the bash file
    2. set the path of pretrained ckpt 
    3. run the code with bash
         ```
