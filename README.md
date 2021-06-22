@@ -1,6 +1,4 @@
-# WMKPN
-
-### Weighted Multi Kernel Prediction Network for Burst Image Super-Resolution
+# Weighted Multi Kernel Prediction Network for Burst Image Super-Resolution
 
 ## Quick Test
 ### Dependencies
