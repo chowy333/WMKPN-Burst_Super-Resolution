@@ -1,4 +1,4 @@
-# Weighted Multi Kernel Prediction Network for Burst Image Super-Resolution <a href="https://openaccess.thecvf.com/content/CVPR2021W/NTIRE/html/Cho_Weighted_Multi-Kernel_Prediction_Network_for_Burst_Image_Super-Resolution_CVPRW_2021_paper.html" target="_blank">[PDF]</a>
+# Weighted Multi Kernel Prediction Network for Burst Image Super-Resolution (CVPRW 2021) <a href="https://openaccess.thecvf.com/content/CVPR2021W/NTIRE/html/Cho_Weighted_Multi-Kernel_Prediction_Network_for_Burst_Image_Super-Resolution_CVPRW_2021_paper.html" target="_blank">[PDF]</a>
 By Wooyeong Cho, Sanghyeok Son, Dae-Shik Kim 
 
 ## Quick Test
