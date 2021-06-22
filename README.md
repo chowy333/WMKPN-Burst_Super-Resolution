@@ -1,4 +1,4 @@
-# Weighted Multi Kernel Prediction Network for Burst Image Super-Resolution <a href="https://arxiv.org/abs/1905.02538" target="_blank">[PDF]</a>
+# Weighted Multi Kernel Prediction Network for Burst Image Super-Resolution <a href="https://openaccess.thecvf.com/content/CVPR2021W/NTIRE/html/Cho_Weighted_Multi-Kernel_Prediction_Network_for_Burst_Image_Super-Resolution_CVPRW_2021_paper.html" target="_blank">[PDF]</a>
 
 ## Quick Test
 ### Dependencies
