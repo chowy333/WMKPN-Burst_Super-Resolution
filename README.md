@@ -1,4 +1,4 @@
-# Weighted Multi Kernel Prediction Network for Burst Image Super-Resolution
+# Weighted Multi Kernel Prediction Network for Burst Image Super-Resolution <a href="https://arxiv.org/abs/1905.02538" target="_blank">[PDF]</a>
 
 ## Quick Test
 ### Dependencies
