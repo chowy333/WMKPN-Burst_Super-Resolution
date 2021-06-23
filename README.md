@@ -8,9 +8,12 @@ By Wooyeong Cho, Sanghyeok Son, Dae-Shik Kim
 - Python packages:  `pip install opencv-python Pillow scikit-image tensorboard`
 
 ### Datasets
-Note that any image dataset except the 
+- Synthetic data: Note that any image dataset except the 
 test split of the [Zurich RAW to RGB dataset](http://people.ee.ethz.ch/~ihnatova/pynet.html#dataset) 
 can be used to generate synthetic bursts for training. 
+
+- Real-World data: containing 639 real-world bursts from [BurstSR](https://data.vision.ee.ethz.ch/bhatg/track2_test_set.zip)
+
 ### Test Models
 
 - evalutate on test dataset with pretrained model by synthtic datasets (+ gamma correctioned images)
