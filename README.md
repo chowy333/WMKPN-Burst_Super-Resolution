@@ -7,6 +7,10 @@ By Wooyeong Cho, Sanghyeok Son, Dae-Shik Kim
 - [PyTorch 1.7.0](https://pytorch.org/) (CUDA version 10.1) 
 - Python packages:  `pip install opencv-python Pillow scikit-image tensorboard`
 
+### Datasets
+Note that any image dataset except the 
+test split of the [Zurich RAW to RGB dataset](http://people.ee.ethz.ch/~ihnatova/pynet.html#dataset) 
+can be used to generate synthetic bursts for training. 
 ### Test Models
 
 - evalutate on test dataset with pretrained model by synthtic datasets (+ gamma correctioned images)
