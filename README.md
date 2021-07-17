@@ -50,6 +50,8 @@ Our model mainly consists of two part, WMKPN and SRNet. WMKPN is a one of the ke
 ![total_net1](https://user-images.githubusercontent.com/46465539/126039353-5cf58307-8e40-4cc3-8ef8-c8b62e512eb2.PNG)
 
 ## Results
+
+### Results on Real Images
 ![qual_syn_total](https://user-images.githubusercontent.com/46465539/126039403-2f66d5e4-8696-48dc-98c8-52d1c6dbb68f.PNG)
 
 ### Citation 
