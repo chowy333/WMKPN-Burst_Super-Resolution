@@ -14,6 +14,7 @@ can be used to generate synthetic bursts for training.
 
 - Real-World data: containing 639 real-world bursts from [BurstSR](https://data.vision.ee.ethz.ch/bhatg/track2_test_set.zip)
 
+
 ### Test Models
 
 - evalutate on test dataset with pretrained model by synthtic datasets (+ gamma correctioned images)
@@ -43,6 +44,13 @@ We trained our model on synthesis datasets.
  3. Training procedure will be printed in footprint_{model_name}-bs_{batch_size}-{filters}-x{scale}.txt
  4. logs and checkpoint file will be saved on "logs/{args.post}/", "ckpts/{args.post}/" respectively.   
 
+### TENet
+Our model mainly consists of two part, WMKPN and SRNet. WMKPN is a one of the key contribution of this paper, utilizing the features from kernel branch and weight branch in this model. Weighted Multiple Kernels are usd to predict an accmulated kernel which can lead to better alignment module for burst images.
+
+![total_net1](https://user-images.githubusercontent.com/46465539/126039353-5cf58307-8e40-4cc3-8ef8-c8b62e512eb2.PNG)
+
+## Results
+![qual_syn_total](https://user-images.githubusercontent.com/46465539/126039403-2f66d5e4-8696-48dc-98c8-52d1c6dbb68f.PNG)
 
 ### Citation 
 Please cite the following paper if you feel WMKPN is useful to your research
