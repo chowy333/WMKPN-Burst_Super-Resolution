@@ -44,7 +44,7 @@ We trained our model on synthesis datasets.
  3. Training procedure will be printed in footprint_{model_name}-bs_{batch_size}-{filters}-x{scale}.txt
  4. logs and checkpoint file will be saved on "logs/{args.post}/", "ckpts/{args.post}/" respectively.   
 
-### TENet
+### WMKPN
 Our model mainly consists of two part, WMKPN and SRNet. WMKPN is a one of the key contribution of this paper, utilizing the features from kernel branch and weight branch in this model. Weighted Multiple Kernels are usd to predict an accmulated kernel which can lead to better alignment module for burst images.
 
 ![total_net1](https://user-images.githubusercontent.com/46465539/126039353-5cf58307-8e40-4cc3-8ef8-c8b62e512eb2.PNG)
