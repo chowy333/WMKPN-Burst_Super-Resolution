@@ -1,7 +1,7 @@
 # Weighted Multi Kernel Prediction Network for Burst Image Super-Resolution (CVPRW 2021) <a href="https://openaccess.thecvf.com/content/CVPR2021W/NTIRE/html/Cho_Weighted_Multi-Kernel_Prediction_Network_for_Burst_Image_Super-Resolution_CVPRW_2021_paper.html" target="_blank">[PDF]</a>
 By [Wooyeong Cho](https://sites.google.com/view/wooyeongcho), [Sanghyeok Son](https://sites.google.com/view/sanghyeokson/%ED%99%88), [Dae-Shik Kim](https://scholar.google.com/citations?user=nd-UgBYAAAAJ&hl=en&oi=ao) 
 
-This projects took participate in New Trends in Image Restoration and Enhancement workshop and challenges on image and video processing ([Ntire 2021 challenge])(https://data.vision.ee.ethz.ch/cvl/ntire21/) in conjunction with CVPR 2021 
+This projects took participate in New Trends in Image Restoration and Enhancement workshop and challenges on image and video processing [Ntire 2021 challenge](https://data.vision.ee.ethz.ch/cvl/ntire21/) in conjunction with CVPR 2021 
 
 - Video/multi-frame challenges(2 tracks): Burst Super-Resolution: Synthetic and Real
 
