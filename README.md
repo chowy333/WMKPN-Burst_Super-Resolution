@@ -21,7 +21,7 @@ can be used to generate synthetic bursts for training.
 
 ### Test Models
 
-- evalutate on test dataset with pretrained model by synthtic datasets (+ gamma correctioned images)
+- How to evalutate on test dataset with pretrained model by synthtic datasets (+ gamma correctioned images)
    1. check the test image path and output image path
    2. set the path of pretrained ckpt 
    3. run the code with bash
@@ -29,7 +29,7 @@ can be used to generate synthetic bursts for training.
         sh ./scripts/test_WMKPN.sh 
         ```  
 
-- save the output image with pretrained model by synthtic datasets (for submission)
+- How to save the output image with pretrained model by synthtic datasets (for submission)
    1. check the test image path and output image path
    2. set the path of pretrained ckpt 
    3. run the code with bash
@@ -38,7 +38,7 @@ can be used to generate synthetic bursts for training.
         ```  
         
 ## How to Train
-We trained our model on synthesis datasets.
+We trained our model on synthetic datasets.
 
  1. check the train image path
  2. run the code with bash
