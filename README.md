@@ -3,6 +3,8 @@ By [Wooyeong Cho](https://sites.google.com/view/wooyeongcho), [Sanghyeok Son](ht
 
 This projects took participate in New Trends in Image Restoration and Enhancement workshop and challenges on image and video processing (Ntire 2021 challenge) in conjunction with CVPR 2021 
 
+- Video/multi-frame challenges(2 tracks): Burst Super-Resolution: Synthetic and Real
+
 ## Quick Test
 ### Dependencies
 - Python >= 3
