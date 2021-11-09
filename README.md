@@ -4,6 +4,7 @@ By [Wooyeong Cho](https://sites.google.com/view/wooyeongcho), [Sanghyeok Son](ht
 This projects took participate in New Trends in Image Restoration and Enhancement workshop and challenges on image and video processing [Ntire 2021 challenge](https://data.vision.ee.ethz.ch/cvl/ntire21/) in conjunction with CVPR 2021 
 
 - Video/multi-frame challenges(2 tracks): Burst Super-Resolution: Synthetic and Real
+- Notice: Since our model is in patent, we will open our source code after patent stages. Thanks for your interest in our work.
 
 ## Quick Test
 ### Dependencies
